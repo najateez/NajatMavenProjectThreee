@@ -1,0 +1,24 @@
+Task:-
+------------------------------
+
+Task: Create a Java application that loads data about articles, authors, and sections from the New York Times API (https://developer.nytimes.com/) into a MySQL or SQL Server database. The application should also perform some basic data analysis and provide the user with relevant statistics.
+
+Use the Java to send API requests to the New York Times API and retrieve articles in JSON format.
+
+Parse the JSON data received from the API and create Java objects representing each article, author, and section.
+
+Connect to a MySQL or SQL Server database using JDBC and create three tables: "articles", "authors", and "sections" with columns for the article title, author, published date, body,section name and other relevant information, and the author name and the section name.
+
+Write code to insert the parsed data into the "articles", "authors", and "sections" tables using prepared statements.
+
+Test the application by running it and checking that the data is being loaded correctly into the MySQL or SQL Server database and that the "articles", "authors", and "sections" tables are being populated as expected.
+
+Once the data is loaded, you can use SQL JOIN to retrieve the section with the most number of articles or the author with the most number of articles.
+
+Use SQL queries to answer the following questions:
+
+What are the top 5 sections with the most articles?
+How many articles were written by each author?
+What are the top 10 articles with the most views?
+How many articles were published each month in the year 2021?
+Which section had the most articles published on a particular day?
