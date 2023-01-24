@@ -1,12 +1,8 @@
 package com.mavenprojectthree;
 
-public class Section {
+public class Section { //anyname class can give. exp: Section -> list of class(Results)-> properties).
 	
 	// from most popular api/ times newswire api
-/*	private String [] results;
-	private String published_date;
-	private String section;
-	private String subsection; */
 	
 	private Results [] results;
 

@@ -2,17 +2,24 @@ package com.mavenprojectthree;
 
 public class Results {
 	
-//	private String published_date;
+	//All from books api :-
+	//all properties for article and author table.. from list of class books.
 	
-	//from most popular api/ times newswire api
+	private Data results;
 	
-	//results->section ->(in api json).
+	public Data getResults() {
+		return results;
+	}
+	public void setResults(Data results) {
+		this.results = results;
+	}
 	
+	//All from most popular api/ times newswire api :-
 	//all properties for section table
 	private String published_date;
 	private String section;
 	private String subsection;
-	
+
 	public String getPublished_date() {
 		return published_date;
 	}
@@ -31,7 +38,6 @@ public class Results {
 	public void setSubsection(String subsection) {
 		this.subsection = subsection;
 	}
-	
-	
+
 
 }
