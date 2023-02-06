@@ -17,8 +17,8 @@ Once the data is loaded, you can use SQL JOIN to retrieve the section with the m
 
 Use SQL queries to answer the following questions:
 
-What are the top 5 sections with the most articles?
-How many articles were written by each author?
-What are the top 10 articles with the most views?
-How many articles were published each month in the year 2021?
-Which section had the most articles published on a particular day?
+1) What are the top 5 sections with the most articles?
+2) How many articles were written by each author?
+3) What are the top 10 articles with the most views?
+4) How many articles were published each month in the year 2021?
+5) Which section had the most articles published on a particular day?

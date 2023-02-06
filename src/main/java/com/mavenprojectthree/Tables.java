@@ -15,11 +15,11 @@ public static void isApiSectionTableCreated() {
 			
 	     // can not create table with duplicate column name
 		String apiSectionTable = "CREATE TABLE Section (" 
-		        + "id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"  
+		        + "section_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"  
 		        + "published_date VARCHAR(100)," 
-		        + "section VARCHAR(100)," 
+		        + "section VARCHAR(100),"
 		        + "subsection VARCHAR(100))"; 
-		
+
 	        Connection con = null;
 	        
 	        try {
@@ -31,7 +31,7 @@ public static void isApiSectionTableCreated() {
 	            Statement st = con.createStatement();
 
 	            int m = st.executeUpdate(apiSectionTable);
-	            if (m >=  1) {
+	            if (m <=  1) {
 	                System.out.println("table Section created successfully : " + apiSectionTable);
 	                
 	            }
@@ -54,8 +54,9 @@ public static void isApiAuthorTableCreated() {
 		
      // can not create table with duplicate column name
 	String apiAuthorTable = "CREATE TABLE Author (" 
-	        + "id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"
-	        + "author VARCHAR(100))"; 
+	        + "author_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"
+	        + "author VARCHAR(100),"
+	        + "article_id int REFERENCES Article (article_id))"; 
 	
         Connection con = null;
         
@@ -68,7 +69,7 @@ public static void isApiAuthorTableCreated() {
             Statement st = con.createStatement();
 
             int m = st.executeUpdate(apiAuthorTable);
-            if (m >=  1) {
+            if (m <=  1) {
                 System.out.println("table Author created successfully : " + apiAuthorTable);
                 
             }
@@ -91,9 +92,10 @@ public static void isApiArticleTableCreated() {
 		
      // can not create table with duplicate column name
 	String apiArticleTable = "CREATE TABLE Article (" 
-	        + "id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"  
+	        + "article_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,"  
 	        + "title VARCHAR(100),"  
-	        + "description VARCHAR(100))"; 
+	        + "description VARCHAR(700),"
+	        + "section_id int REFERENCES Section (section_id))"; 
 	
         Connection con = null;
         
@@ -106,7 +108,7 @@ public static void isApiArticleTableCreated() {
             Statement st = con.createStatement();
 
             int m = st.executeUpdate(apiArticleTable);
-            if (m >=  1) {
+            if (m <=  1) {
                 System.out.println("table Article created successfully : " + apiArticleTable);
                 
             }

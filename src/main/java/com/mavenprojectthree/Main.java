@@ -1,12 +1,16 @@
 package com.mavenprojectthree;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Scanner;
 
@@ -36,7 +40,7 @@ public class Main {
 				.build();
 
 		HttpResponse<String> response = hClient.send(requestData, HttpResponse.BodyHandlers.ofString());
-		System.out.println(response.body());
+	//	System.out.println(response.body());
 
 		 Gson gson=new Gson(); //print all data in one line then insert
 
@@ -48,14 +52,14 @@ public class Main {
 		String jsonString = gson.toJson(jElement);
 		//System.out.println(jsonString);
 
-		Section data = gson.fromJson(jsonString, Section.class); // the class which contains list of class Results. up.
+		Section data = gson.fromJson(jsonString, Section.class); 
 
 		Connection con = null;
 		Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
 		DriverManager.registerDriver(driver);
 		con = (Connection) DriverManager.getConnection(url, user, pass);
 
-		for (int i=0;i<response.body().length();i++) {
+		for (int i=0;i<data.getResults().length;i++) {
 			String published_date = data.getResults()[i].getPublished_date();
 			String section = data.getResults()[i].getSection();
 			String subsection = data.getResults()[i].getSubsection();
@@ -64,7 +68,7 @@ public class Main {
 			String SqlQuery = "INSERT INTO Section (published_date,section,subsection) VALUES"
 					+ " ('" + published_date + "' ,'" + section + "', '" + subsection + "')";
 
-			System.out.println(SqlQuery);
+		//	System.out.println(SqlQuery);
 
 			try {
 				Statement st = con.createStatement();
@@ -117,32 +121,37 @@ public class Main {
 		Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
 		DriverManager.registerDriver(driver);
 		con = (Connection) DriverManager.getConnection(url, user, pass);
+		
+		Statement st = con.createStatement();
 
 		for (int i=0;i<data.getResults().getBooks().length;i++) {
 			String title = data.getResults().getBooks()[i].getTitle();
 			String description = data.getResults().getBooks()[i].getDescription();
 	//		String author = data.getBooks()[i].getAuthor();
 			
-
-			String sqlArticle = "INSERT INTO Article (title,description) VALUES"
-					+ " ('" + title + "' ,'" + description + "')";
-
-			System.out.println(sqlArticle);
+			Scanner in=new Scanner(System.in);
 			
-	/*		String sqlAuthor = "INSERT INTO Author (author) VALUES"
-					+ " ('" + author + "')";
+			System.out.println("enter any section name from section table:");
+			String section=in.next();
+			
+			 String sql1="SELECT section_id FROM Section WHERE section='"+section+"'";
+	          ResultSet rs = st.executeQuery(sql1);
+	          rs.next();
+				int section_id = rs.getInt("section_id");  
+			
 
-			System.out.println(sqlAuthor); */
+			String sqlArticle = "INSERT INTO Article (title,description,section_id) VALUES"
+					+ " ('" + title + "' ,'" + description + "' ,'" + section_id +"')";
+
 
 			try {
-				Statement st = con.createStatement();
+			//	Statement st = con.createStatement();
 
 				// Executing query
 				int m = st.executeUpdate(sqlArticle);
-			//	int m1 = st.executeUpdate(sqlAuthor);
+
 				if (m >= 0 ) {
 					System.out.println("Article api values inserted successfully : " + sqlArticle);
-			//	System.out.println("Author api values inserted successfully : " +sqlAuthor);
 				}else {
 					System.out.println("insertion failed");
 				// Closing the connections
@@ -188,18 +197,32 @@ public class Main {
 		Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
 		DriverManager.registerDriver(driver);
 		con = (Connection) DriverManager.getConnection(url, user, pass);
+		 Statement st = con.createStatement();
 
 		for (int i=0;i<data.getResults().getBooks().length;i++) {
 			String author = data.getResults().getBooks()[i].getAuthor();
 			
+            Scanner in=new Scanner(System.in);
+			
+			System.out.println("enter title from article table:");
+			// we used here buffer reader to allow read more than one word in one row 
+			BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+			String title=br.readLine();
+//			String title=in.next();
+			
+			 String sql1="SELECT article_id FROM Article WHERE title='"+title+"'";
+	          ResultSet rs = st.executeQuery(sql1);
+	          rs.next();
+				int article_id = rs.getInt("article_id");
+			
+				
+			String sqlAuthor = "INSERT INTO Author (author,article_id) VALUES"
+					+ " ('" + author + "' ,'" + article_id +"')";
 
-			String sqlAuthor = "INSERT INTO Author (author) VALUES"
-					+ " ('" + author + "')";
-
-			System.out.println(sqlAuthor);
+	
 			
 			try {
-				Statement st = con.createStatement();
+			//	Statement st = con.createStatement();
 
 				// Executing query
 				int m = st.executeUpdate(sqlAuthor);
@@ -215,6 +238,128 @@ public class Main {
 	}
 	
 	
+	public static void top5SectionsWithTheMostArticles(int top5Sections) throws IOException, InterruptedException {
+		
+		String url = "jdbc:mysql://localhost:3306/apimpthreedb";
+		String user = "root";
+		String pass = "10@104Ar$";
+		
+		HttpClient hClient = HttpClient.newHttpClient();
+		HttpRequest requestData = HttpRequest.newBuilder()
+				.uri(URI.create("https://api.nytimes.com/svc/mostpopular/v2/emailed/7.json?api-key=xfjwbyKIMp0lGS0Tn3DSFx3JvLo2iCBX"))
+				.build();
+
+		HttpResponse<String> response = hClient.send(requestData, HttpResponse.BodyHandlers.ofString());
+		
+		 Gson gson=new Gson();
+		 
+		JsonParser jParser = new JsonParser(); // import from library
+		JsonElement jElement = jParser.parse(response.body()); // previous string (up) that json shape. import library
+		String jsonString = gson.toJson(jElement);
+		//System.out.println(jsonString);
+
+		Section data = gson.fromJson(jsonString, Section.class);
+		
+		int count=0;
+		Connection con = null;
+		PreparedStatement prst = null;
+		
+		try {
+			 Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
+			 DriverManager.registerDriver(driver);
+			 
+			 con = (Connection) DriverManager.getConnection(url, user, pass);
+			 Statement st = con.createStatement();
+			 
+			 Scanner in=new Scanner(System.in);
+			 
+			 String sql = "SELECT * FROM Article";
+			 ResultSet rs = st.executeQuery(sql);  //ResultSet class import from library
+			 
+			while (rs.next() && count < top5Sections) {
+				int article_id = rs.getInt("article_id");
+				String titlee = rs.getString("title");
+				String description = rs.getString("description");
+				int section_idd = rs.getInt("section_id");
+				
+				System.out.println("article id: "+ article_id + ", title:" + titlee + ", description:" + description +", section id:" + section_idd);
+				count++;
+			 }
+			con.close();
+		}catch (Exception ex) {
+			System.err.println(ex);
+		}
+	} 
+	
+	
+	public static void howManyArticlesWereWrittenByEachAuthor() {
+		
+	}
+	
+	
+public static void top10ArticlesWithTheMostViews(int top10Articles) throws IOException, InterruptedException {
+		
+		String url = "jdbc:mysql://localhost:3306/apimpthreedb";
+		String user = "root";
+		String pass = "10@104Ar$";
+		
+		HttpClient hClient = HttpClient.newHttpClient();
+		HttpRequest requestData = HttpRequest.newBuilder()
+				.uri(URI.create("https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json?api-key=xfjwbyKIMp0lGS0Tn3DSFx3JvLo2iCBX"))
+				.build();
+
+		HttpResponse<String> response = hClient.send(requestData, HttpResponse.BodyHandlers.ofString());
+		
+		 Gson gson=new Gson();
+		 
+		JsonParser jParser = new JsonParser(); // import from library
+		JsonElement jElement = jParser.parse(response.body()); // previous string (up) that json shape. import library
+		String jsonString = gson.toJson(jElement);
+		//System.out.println(jsonString);
+
+		Section data = gson.fromJson(jsonString, Section.class);
+		
+		int count=0;
+		Connection con = null;
+		PreparedStatement prst = null;
+		
+		try {
+			 Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
+			 DriverManager.registerDriver(driver);
+			 
+			 con = (Connection) DriverManager.getConnection(url, user, pass);
+			 Statement st = con.createStatement();
+			 
+			 Scanner in=new Scanner(System.in);
+			 
+			 String sql = "SELECT * FROM Author";
+			 ResultSet rs = st.executeQuery(sql);  //ResultSet class import from library
+			 
+			while (rs.next() && count < top10Articles) {
+				int author_id = rs.getInt("author_id");
+				String author = rs.getString("author");
+				String description = rs.getString("description");
+				int section_idd = rs.getInt("section_id");
+				
+				System.out.println("author id: "+ author_id + ", author:" + author + ", description:" + description +", section id:" + section_idd);
+				count++;
+			 }
+			con.close();
+		}catch (Exception ex) {
+			System.err.println(ex);
+		}
+	}
+
+
+
+public static void howManyArticlesWerePublishedEachMonthInTheYear2021() {
+	
+}
+
+public static void whichSectionHadTheMostArticlesPublishedOnAParticularDay() {
+	
+}
+
 	
 	
 	public static void main(String[] args) throws IOException, InterruptedException, Exception {
@@ -229,6 +374,11 @@ public class Main {
 			System.out.println("1:insert values of json api in db for article table.");
 			System.out.println("2:insert values of json api in db for author table.");
 			System.out.println("3:Exit");
+			System.out.println("4:What are the top 5 sections with the most articles?");
+			System.out.println("5:How many articles were written by each author?");
+			System.out.println("6:What are the top 10 articles with the most views?");
+			System.out.println("7:How many articles were published each month in the year 2021?");
+			System.out.println("8:Which section had the most articles published on a particular day?");
 			System.out.println("*******************************");
 			System.out.println("Enter a number from menu: ");
 			int choice = in.nextInt();
@@ -236,22 +386,42 @@ public class Main {
 			switch (choice) {
 			case 0: {
 		     insertValuesInDbApiForSectionTable();
+		     System.out.println("*******************************");
 		     break;
 			}case 1:{
 			  insertValuesInDbApiForArticleTable();
+			  System.out.println("*******************************");
 			 break;
 			}case 2:{
 			  insertValuesInDbApiForAuthorTable();
+			  System.out.println("*******************************");
 			   break;
 			}case 3: {
 			 return;
+			}case 4: {
+				top5SectionsWithTheMostArticles(5);
+				System.out.println("*******************************");
+				break;
+			}case 5: {
+				
+				break;
+			}case 6: {
+			
+				break;
+			}case 7: {
+				
+				break;
+			}case 8: {
+				
+				break;
 			}default:{
 				System.out.println("it is not an option try again ");
+				System.out.println("*******************************");
 			}
 			}
 		
 	}
 	
-	}
+	} 
 
 }
