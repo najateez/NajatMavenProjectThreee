@@ -205,7 +205,7 @@ public class Main {
             Scanner in=new Scanner(System.in);
 			
 			System.out.println("enter title from article table:");
-			// we used here buffer reader to allow read more than one word in one row 
+			// we used here buffer reader to allow read more than one word in one row of one column.
 			BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
 			String title=br.readLine();
 //			String title=in.next();
@@ -238,7 +238,7 @@ public class Main {
 	}
 	
 	
-	public static void top5SectionsWithTheMostArticles(int top5Sections) throws IOException, InterruptedException {
+/*	public static void top5SectionsWithTheMostArticles(int top5Sections) throws IOException, InterruptedException {
 		
 		String url = "jdbc:mysql://localhost:3306/apimpthreedb";
 		String user = "root";
@@ -289,15 +289,49 @@ public class Main {
 		}catch (Exception ex) {
 			System.err.println(ex);
 		}
-	} 
+	} */
 	
 	
 	public static void howManyArticlesWereWrittenByEachAuthor() {
 		
+		String url = "jdbc:mysql://localhost:3306/apimpthreedb";
+	    String user = "root";
+        String pass = "10@104Ar$";
+        
+        Connection con = null;
+        
+        try {
+			Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
+			DriverManager.registerDriver(driver);
+			con = (Connection) DriverManager.getConnection(url, user, pass);
+			Statement st = con.createStatement();
+			
+			Scanner in = new Scanner(System.in);
+			
+			System.out.println("enter author from author table:");
+			BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+			String author=br.readLine();
+		//	String author=in.next();
+			
+			// https://stackoverflow.com/questions/8960638/java-mysql-count-number-of-rows
+			
+			String sql = "select count(*) from Author inner join Article on Author.article_id=Article.article_id where Author.author='" + author + "'";
+			ResultSet rs = st.executeQuery(sql);
+			
+			while (rs.next()) {
+				 
+				author=rs.getString("count(*)");
+				
+				System.out.println("Articles were written by this author: " + author );
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+		
 	}
 	
 	
-public static void top10ArticlesWithTheMostViews(int top10Articles) throws IOException, InterruptedException {
+/* public static void top10ArticlesWithTheMostViews(int top10Articles) throws IOException, InterruptedException {
 		
 		String url = "jdbc:mysql://localhost:3306/apimpthreedb";
 		String user = "root";
@@ -348,11 +382,40 @@ public static void top10ArticlesWithTheMostViews(int top10Articles) throws IOExc
 		}catch (Exception ex) {
 			System.err.println(ex);
 		}
-	}
+	} */
 
 
 
 public static void howManyArticlesWerePublishedEachMonthInTheYear2021() {
+	
+	String url = "jdbc:mysql://localhost:3306/apimpthreedb";
+    String user = "root";
+    String pass = "10@104Ar$";
+    
+    Connection con = null;
+    
+    try {
+		Driver driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
+		DriverManager.registerDriver(driver);
+		con = (Connection) DriverManager.getConnection(url, user, pass);
+		Statement st = con.createStatement();
+		
+		Scanner in = new Scanner(System.in);
+		
+		// https://stackoverflow.com/questions/8960638/java-mysql-count-number-of-rows
+		
+		String sql = "select count(*) from Article inner join Section on Article.section_id=Section.section_id where Section.published_date LIKE '2021%'";
+		ResultSet rs = st.executeQuery(sql);
+		
+		while (rs.next()) {
+			 
+			String published_date=rs.getString("count(*)");
+			
+			System.out.println("Articles were published each month in the year 2021: " + published_date );
+		}
+	} catch (Exception e) {
+		System.err.println(e);
+	}
 	
 }
 
@@ -399,17 +462,18 @@ public static void whichSectionHadTheMostArticlesPublishedOnAParticularDay() {
 			}case 3: {
 			 return;
 			}case 4: {
-				top5SectionsWithTheMostArticles(5);
+			//	top5SectionsWithTheMostArticles(5);
 				System.out.println("*******************************");
 				break;
 			}case 5: {
-				
+				howManyArticlesWereWrittenByEachAuthor();
+				System.out.println("*******************************");
 				break;
 			}case 6: {
 			
 				break;
 			}case 7: {
-				
+				howManyArticlesWerePublishedEachMonthInTheYear2021();
 				break;
 			}case 8: {
 				
